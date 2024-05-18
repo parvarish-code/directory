@@ -21,6 +21,17 @@ app.post('/members',async(req,res) => {
     }
 });
 
+// Read ( GET - all members )
+app.get('/members',async(req,res) => {
+    try {
+        const members = await Member.find({});
+        res.json(members);
+    } catch (error) {
+        res.status(500).json({ error : error.message})
+    }
+});
+
+
 //start the server
 app.listen(PORT,() => {
     console.log(`Server listening at http://localhost:${PORT}`);
