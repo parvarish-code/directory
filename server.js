@@ -1,10 +1,17 @@
 const express = require('express');
 const cors = require('cors');
 const app = express();
+const bodyParser = require('body-parser');
 const PORT = 3001;
 const Member = require('./models/member');
+require('./db');
 
 app.use(cors());// Enable cors for all routes
+// parse application/x-www-form-urlencoded
+app.use(bodyParser.urlencoded({ extended: false }))
+
+// parse application/json
+app.use(bodyParser.json())
 
 
 //Basic Route
