@@ -50,12 +50,13 @@ app.get('/members/:id',async (req,res) => {
         }
         res.json(member);
     } catch (error) {
+        console.error('erroorrrrr')
         res.status(500).json({error:error.message});
     }
 });
 
 //Update (PUT)
-app.put('/member/:id',async(req,res) => {
+app.put('/members/:id',async(req,res) => {
     try {
         const updatedMember = await Member.findByIdAndUpdate(req.params.id,req.body,{new:true});
         if(!updatedMember){
