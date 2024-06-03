@@ -2,6 +2,8 @@ const express = require('express');
 const cors = require('cors');
 const app = express();
 const bodyParser = require('body-parser');
+const jwt = require('jsonwebtoken');
+const bcrypt = require('bcryptjs');
 const PORT = 3001;
 const Member = require('./models/member');
 require('./db');
@@ -19,17 +21,56 @@ app.get('/',(req,res) => {
     res.send('Hello from Express Server');
 });
 
-//Create ( POST )
-
-app.post('/members',async(req,res) => {
+//Register new member
+app.post('/register',async(req,res) => {
     try {
-        const newMember = new Member(req.body);
+        const {name,email,password} = req.body;
+
+        //Hash the password
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash(password,salt);
+
+        const newMember = new Member({
+            name,
+            email,
+            password:hashedPassword
+        });
+
         const savedMember = await newMember.save();
-        res.status(201).json(savedMember);
+        res.status(201).json({ message:'Member registered Successfully'});
     } catch (error) {
-        res.status(500).json({ error: error.message});
+        res.status(500).json({ error:error.message});
     }
 });
+
+//Authenticate Member
+app.post('/login',async(req,res) => {
+    try {
+        const { email,password } = req.body;
+        const member = await Member.findOne({email});
+
+        if(!member || !await bcrypt.compare(password,member.password)){
+            return res.status(401).json({ error:'Invalid Credentials'});
+        }
+
+        const token = jwt.sign({userId:member._id},'code everything');
+        res.json({token});
+    } catch (error) {
+        res.status(500).json({ error:error.message});
+    }
+})
+
+//Create ( POST )
+
+// app.post('/members',async(req,res) => {
+//     try {
+//         const newMember = new Member(req.body);
+//         const savedMember = await newMember.save();
+//         res.status(201).json(savedMember);
+//     } catch (error) {
+//         res.status(500).json({ error: error.message});
+//     }
+// });
 
 // Read ( GET - all members )
 app.get('/members',async(req,res) => {
