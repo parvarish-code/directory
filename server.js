@@ -54,9 +54,28 @@ app.post('/login',async(req,res) => {
         }
 
         const token = jwt.sign({userId:member._id},'code everything');
-        res.json({token});
+        res.json({token,member});
     } catch (error) {
         res.status(500).json({ error:error.message});
+    }
+})
+
+//verify token route
+app.post('/verifyToken',async(req,res)=>{
+    try {
+        const { token } = req.body;
+        console.log(token)
+
+        const decoded = jwt.verify(token,'code everything');
+        const member = await Member.findById(decoded.userId);
+
+        if(!member){
+            return res.status(401).json({ error:'Invalid token'});
+        }
+
+        res.json({ valid:true,member});
+    } catch (error) {
+        res.status(401).json({ error:'Invalid token'});
     }
 })
 
