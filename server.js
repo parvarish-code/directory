@@ -64,7 +64,7 @@ app.post('/login',async(req,res) => {
 app.post('/verifyToken',async(req,res)=>{
     try {
         const { token } = req.body;
-        console.log(token)
+        
 
         const decoded = jwt.verify(token,'code everything');
         const member = await Member.findById(decoded.userId);
