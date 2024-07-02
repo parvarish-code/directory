@@ -151,11 +151,18 @@ app.get('/bulletin',async (req,res) => {
     res.status(201).json({bulletin:foundBulletin})
 });
  
-app.post('/admin/bulletin',  async (req,res)=>{
-    const {text} = req.body;
+app.post('/admin/:id/bulletin',  async (req,res)=>{
+    const {heading,body} = req.body;
+    const admin = await Member.findById(req.params.id);
+    console.log(admin)
 
     try {
-        const newMessage = new Message({ text });
+        const newMessage = new Message({ 
+            heading,
+            body,
+            date:Date.now(),
+            author:admin._id
+         });
        await newMessage.save();
 
     //   const newBulletin = new Bulletin({messages:[]})
@@ -164,7 +171,7 @@ app.post('/admin/bulletin',  async (req,res)=>{
     //   console.log(newBulletin)
 
        const FoundBulletin = await Bulletin.findOne({});
-       console.log(FoundBulletin)
+      
         
        FoundBulletin.messages.push(newMessage);
        FoundBulletin.save()

@@ -1,9 +1,20 @@
 const mongoose = require('mongoose');
+const Member = require('./member');
 
 
 const messageSchema = new mongoose.Schema({
-    text : {
+    date:{
+        type:Date
+    },
+    heading:{
         type:String
+    },
+    body : {
+        type:String
+    },
+    author:{
+        type:mongoose.Schema.Types.ObjectId,
+        ref:'Member'
     }
 });
 
