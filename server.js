@@ -6,6 +6,9 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const PORT = 3001;
 const Member = require('./models/member');
+const Bulletin = require('./models/bulletin');
+const Message = require('./models/message');
+const { Mongoose } = require('mongoose');
 require('./db');
 
 app.use(cors());// Enable cors for all routes
@@ -140,6 +143,37 @@ app.delete('/members/:id',async(req,res) => {
         res.status(500).json({ error:error.message});
     }
 })
+
+app.get('/bulletin',async (req,res) => {
+    console.log('fetch bulletin')
+    const foundBulletin = await Bulletin.findOne({}).populate('messages').exec();
+    console.log(foundBulletin)
+    res.status(201).json({bulletin:foundBulletin})
+});
+ 
+app.post('/admin/bulletin',  async (req,res)=>{
+    const {text} = req.body;
+
+    try {
+        const newMessage = new Message({ text });
+       await newMessage.save();
+
+    //   const newBulletin = new Bulletin({messages:[]})
+    //   await newBulletin.save();
+
+    //   console.log(newBulletin)
+
+       const FoundBulletin = await Bulletin.findOne({});
+       console.log(FoundBulletin)
+        
+       FoundBulletin.messages.push(newMessage);
+       FoundBulletin.save()
+        
+    } catch (error) {
+        console.log(error)
+    }
+    
+});
 
 //start the server
 app.listen(PORT,() => {
